@@ -44,7 +44,7 @@ Etudiant* ajouter_ennemi(Etudiant *tete, int tour, int ligne, int colonne, char 
             nouvel_etudiant->degats = 2;
             break;
         
-        case 'C'://colosse
+        case 'M'://LE MAJORANT
             nouvel_etudiant->pointsDeVie = 10;
             nouvel_etudiant->degats = 0;
 
