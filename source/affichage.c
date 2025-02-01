@@ -51,7 +51,7 @@ void afficher_grille(char grille[LIGNES][COLONNES], int tour, int cagnotte, Etud
         printf("%2d |", i + 1); // Affichage du numéro de ligne
 
         for (int j = 0; j < COLONNES; j++) {
-            char type = grille[i][j];
+            char type = grille[i][j]; //la case
 
             // Déterminer si une entité est un ennemi et récupérer ses points de vie
             int vie = -1;
@@ -80,9 +80,13 @@ void afficher_grille(char grille[LIGNES][COLONNES], int tour, int cagnotte, Etud
 
                 printf(" %s%-2c\033[0m", couleur, type);  // Appliquer la couleur dynamique
             }
+
+
             // Vérifier si c'est une tourelle pour appliquer l'effet orange si endommagée
-            else if (type == 'T') {  
+            else if (type == 'T' || type=='L' || type=='P') {  
+
                 Tourelle *courant_t = tourelles;
+
                 while (courant_t != NULL) {
                     if (courant_t->ligne - 1 == i && courant_t->colonne == j) {
                         break;
@@ -91,20 +95,28 @@ void afficher_grille(char grille[LIGNES][COLONNES], int tour, int cagnotte, Etud
                 }
 
                 if (courant_t != NULL) {
-                    if (courant_t->vie < 3) { // Si la tourelle est endommagée, elle devient orange
+                    if (courant_t->vie < 3) { // Si la tourelle a peu de vie, elle devient orange
                         printf(" \x1B[38;2;255;165;0m%-2c\033[0m", type);
-                    } else {
+                    } 
+                    
+                    else {
                         printf(" \033[34m%-2c\033[0m", type);  // Affichage des tourelles normales en bleu
                     }
-                } else {
+                } 
+                
+                else {
                     printf(" %-2c", type); // Affichage normal
                 }
             }
+
             else {  
                 printf(" %-2c", type);  // cases vides
             }
+
         }
+
         printf("\n");
+
     }
 }
 

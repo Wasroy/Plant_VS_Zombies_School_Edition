@@ -31,15 +31,13 @@ int verifier_fin(char grille[LIGNES][COLONNES]) {
     int p=0;
     for(int i = 0; i<LIGNES; i++){
         for(int j = 0; j < COLONNES; j++){
-            if (grille[i][j]=='Z')
+            if (grille[i][j]=='Z' && grille[i][j]=='A' && grille[i][j]=='V' && grille[i][j]=='M' && grille[i][j]=='S')
                 p=1;
         }
     }
     if(p==0)
         return 1; //Il n'y a plus d'ennemis dans le jeu 
     return 0;
-
-
 
 }
 
@@ -59,13 +57,15 @@ Etudiant* charger_partie(const char *fichier, int *cagnotte) {
     }
 
     Etudiant *tete = NULL;
-    int tour, ligne;
+    int tour; 
+    int ligne;
     char type;
 
     while (fscanf(fp, "%d %d %c", &tour, &ligne, &type) == 3) {
         tete = ajouter_ennemi(tete, tour, ligne, COLONNES, type);
     }
 
+ 
     fclose(fp);
     return tete;
 }
@@ -81,11 +81,12 @@ void sauvegarder_partie(const char *fichier, int tour, int cagnotte, Tourelle *t
 
     Tourelle *t_courant = tourelles;
     while (t_courant != NULL) {
-        fprintf(fp, "T %d %d %d\n", t_courant->ligne, t_courant->colonne, t_courant->portee);
+        fprintf(fp, "%c %d %d %d\n", t_courant->type, t_courant->ligne, t_courant->colonne);
         t_courant = t_courant->suivant;
     }
 
     Etudiant *e_courant = ennemis;
+
     while (e_courant != NULL) {
         fprintf(fp, "E %d %d %d %c %d\n", e_courant->tour, e_courant->ligne, e_courant->colonne, e_courant->type, e_courant->actif);
         e_courant = e_courant->suivant;
@@ -113,15 +114,18 @@ void charger_sauvegarde(const char *fichier, int *tour, int *cagnotte, Tourelle 
 
     char type;
     while (fscanf(fp, " %c", &type) == 1) {
-        if (type == 'T') {
+        if (type == 'T' || type=='L' || type=='P') {
             int ligne, colonne, portee;
-            if (fscanf(fp, "%d %d %d", &ligne, &colonne, &portee) == 3) {
-                *tourelles = ajouter_tourelle(*tourelles, ligne, colonne, portee);
+            if (fscanf(fp, "%d %d", &ligne, &colonne) == 2) {
+                *tourelles = ajouter_tourelle(*tourelles, ligne, colonne, type);
             }
-        } else if (type == 'E') {
+
+        } 
+
+        else if (type == 'E') {
             int t, l, c, actif;
             char e_type;
-            if (fscanf(fp, "%d %d %d %c %d", &t, &l, &c, &e_type, &actif) == 5) {
+            if (fscanf(fp, "%d %d %d %c %d", &t, &l, &c, &e_type, &actif) == 5) { // en gros on verif si la ligne possède bien toutes les infos necessaire grace au ==
                 Etudiant *nouvel_ennemi = ajouter_ennemi(*ennemis, t, l, c, e_type);
                 nouvel_ennemi->actif = actif;
                 *ennemis = nouvel_ennemi;

@@ -9,7 +9,7 @@
 #define COLONNES 15
 
 
-Tourelle* ajouter_tourelle(Tourelle *tete, int ligne, int colonne, int portee) {
+Tourelle* ajouter_tourelle(Tourelle *tete, int ligne, int colonne, char type) {
     Tourelle *nouvelle_tourelle = malloc(sizeof(Tourelle));
     if (nouvelle_tourelle == NULL) {
         perror("Erreur d'allocation mémoire");
@@ -17,9 +17,34 @@ Tourelle* ajouter_tourelle(Tourelle *tete, int ligne, int colonne, int portee) {
     }
     nouvelle_tourelle->ligne = ligne;
     nouvelle_tourelle->colonne = colonne;
-    nouvelle_tourelle->portee = portee;
+
     nouvelle_tourelle->suivant = tete; // Ajoute en tête de liste
-    nouvelle_tourelle->vie = 5;
+
+    //on utilise un switch pour les diff types de tourelles selon leurs types
+
+    switch (type) {
+        case 'T': // Tourelle basique
+            nouvelle_tourelle->vie = 5;
+            nouvelle_tourelle->degats = 2;
+            nouvelle_tourelle->portee = 3;
+            break;
+        case 'L': // Tourelle longue portée
+            nouvelle_tourelle->vie = 4;
+            nouvelle_tourelle->degats = 1;
+            nouvelle_tourelle->portee = 5;
+            break;
+        case 'P': // Tourelle puissante
+            nouvelle_tourelle->vie = 6;
+            nouvelle_tourelle->degats = 4;
+            nouvelle_tourelle->portee = 2;
+            break;
+
+        default:
+            printf("Type de tourelle inconnu : %c\n", type);
+            free(nouvelle_tourelle);
+            return NULL;
+    }
+    
     return nouvelle_tourelle;
 }
 
@@ -39,16 +64,13 @@ void attaquer_ennemis(char grille[LIGNES][COLONNES], Tourelle *tourelles, Etudia
 
                 if (courant_e->actif && courant_e->ligne == courant_t->ligne && courant_e->colonne == colonne_cible) {
 
-                    //printf("Tourelle [%d, %d] tire sur l'ennemi [%c] (ligne : %d, colonne : %d).\n", courant_t->ligne, courant_t->colonne+1, courant_e->type, courant_e->ligne, courant_e->colonne);
-
-                    courant_e->pointsDeVie-=3;
+                    courant_e->pointsDeVie-=courant_t->degats;
 
                     if (courant_e->pointsDeVie<=0){
-                        //printf("\x1B[38;2;255;0;0mEnnemi [%c] éliminé!\033[0m\n", courant_e->type);
-                        courant_e->actif = 0; // Désactive l'ennemi 
+                        courant_e->actif = 0; // desactive l'ennemi => le supppr de l'affichage
                         //A FAIRE supprimer_enenemi(courant_e)
                         //A FAIRE rajouter de l'argent a la cagnotte
-                        grille[courant_e->ligne - 1][courant_e->colonne] = '.'; // Efface l'ennemi de la grille
+                        grille[courant_e->ligne - 1][courant_e->colonne] = '.'; // Efface l'ennemi de la grille car remplacer par un .
 
                     }
  
@@ -102,24 +124,28 @@ Tourelle* supprimer_tourelle(Tourelle *tete, int ligne, int colonne) {
     Tourelle *precedent = NULL;
 
     while (courant != NULL) {
+
         if (courant->ligne == ligne && courant->colonne == colonne) {
-            printf("DEBUG : Suppression de la tourelle en [%d, %d]\n", ligne, colonne);
+
             if (precedent == NULL) {  
                 Tourelle *temp = courant->suivant;
                 free(courant);
                 return temp;
-            } else {
+            } 
+            
+            else {
                 precedent->suivant = courant->suivant;
                 free(courant);
                 return tete;
             }
+
         }
 
         precedent = courant;
         courant = courant->suivant;
     }
 
-    printf("DEBUG : Aucune tourelle trouvée à [%d, %d]\n", ligne, colonne);
     return tete;
+
 }
 
