@@ -8,7 +8,7 @@
 
 
 void afficher_grille(char grille[LIGNES][COLONNES], int tour, int cagnotte, Etudiant *ennemis, Tourelle *tourelles) {
-    printf("\n \033[33m Tour %d  | Cagnotte %d \033[0m \n\n", tour, cagnotte);
+    printf("\n \033[33m Tour %d  | Cagnotte %d \033[0m \n", tour, cagnotte);
 
     // Affichage des numéros de colonnes
     printf("    "); 
@@ -111,7 +111,7 @@ void initialiser_grille(char grille[LIGNES][COLONNES], Tourelle *tete) {
         } 
         
         else {
-            grille[courant->ligne - 1][courant->colonne] = courant->type; // Modification problématique ici
+            grille[courant->ligne - 1][courant->colonne] = courant->type; //on met la bonne lettre par rapport au type de l'ennemi
             //printf("debug typpe est : %c .",courant->type);
         }
         

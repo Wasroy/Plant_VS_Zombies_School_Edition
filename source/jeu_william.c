@@ -31,7 +31,7 @@ int verifier_fin(char grille[LIGNES][COLONNES]) {
     int p=0;
     for(int i = 0; i<LIGNES; i++){
         for(int j = 0; j < COLONNES; j++){
-            if (grille[i][j]=='Z' || grille[i][j]=='A' || grille[i][j]=='V' || grille[i][j]=='M' || grille[i][j]=='S'){ //en gros si il suffit d'une case ou il y a un ennemi
+            if (grille[i][j]=='Z' || grille[i][j]=='A' || grille[i][j]=='V' || grille[i][j]=='M' || grille[i][j]=='S'){ //en gros si il suffit d'une case ou il y a S
                 p=1;
             }
         }
@@ -139,7 +139,6 @@ void charger_sauvegarde(const char *fichier, int *tour, int *cagnotte, Tourelle 
     printf("\n\033[32mSauvegarde chargée avec succès !\033[0m\n");
 }
 
-
 int est_case_occupee(int ligne, int colonne, Tourelle *tourelles, Etudiant *ennemis) {
     // Vérifier si une tourelle est déjà présente
     Tourelle *t_courant = tourelles;
@@ -161,3 +160,57 @@ int est_case_occupee(int ligne, int colonne, Tourelle *tourelles, Etudiant *enne
 
     return 0;  // La case est libre
 }
+
+void deplacer_ennemis(char grille[LIGNES][COLONNES], Etudiant *ennemis, Tourelle *tourelles) {
+    Etudiant *courant = ennemis;
+
+    while (courant != NULL) {
+
+        if (courant->colonne<0){
+            courant->actif = 0;
+        }
+
+
+        if (courant->actif) {
+            int nouvelle_colonne = courant->colonne - 1;  // L'ennemi veut avancer vers la gauche
+
+            // Vérifier s'il y a une tourelle devant l'ennemi
+            Tourelle *t_courant = tourelles;
+            int tourelle_bloquante = 0;
+
+            while (t_courant != NULL) {
+                if (t_courant->ligne == courant->ligne && t_courant->colonne == nouvelle_colonne) {
+                    tourelle_bloquante = 1;
+                    break;
+                }
+                t_courant = t_courant->suivant;
+            }
+
+            // Vérifier si un autre ennemi bloque le passage
+            Etudiant *e_courant = ennemis;
+            int ennemi_bloquant = 0;
+
+            while (e_courant != NULL) {
+                if (e_courant->actif && e_courant->ligne == courant->ligne &&
+                    e_courant->colonne == nouvelle_colonne) {
+                    ennemi_bloquant = 1;
+                    break;
+                }
+                e_courant = e_courant->suivant;
+            }
+
+            if (tourelle_bloquante) {
+                printf(" -> 🚧 Bloqué par une tourelle en (%d, %d) !\n", courant->ligne, nouvelle_colonne);
+            } 
+            else if (ennemi_bloquant) {
+                printf(" -> 🚶 Bloqué par un autre ennemi en (%d, %d) !\n", courant->ligne, nouvelle_colonne);
+            } 
+            
+            else {
+                courant->colonne = nouvelle_colonne;
+            }
+        }
+        courant = courant->suivant;
+    }
+}
+

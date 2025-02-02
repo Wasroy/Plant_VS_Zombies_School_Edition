@@ -55,10 +55,14 @@ int main() {
     }
 
 
-    //on commence avec 3 tourelles de base
-    tourelles = ajouter_tourelle(tourelles, 1,0, 'T');
+    //on commence avec 3 tourelles de base 
+    tourelles = ajouter_tourelle(tourelles, 1,0, 'T'); // ligne colonne-1 type
     tourelles = ajouter_tourelle(tourelles, 7,0, 'L');
     tourelles = ajouter_tourelle(tourelles, 4,2, 'P');
+
+    tourelles = ajouter_tourelle(tourelles, 3, 10, 'T');
+
+
 
 
     int tourelles_place = 3; //on commence chaque partie avec 3 tourelles dès le début !
@@ -86,7 +90,7 @@ int main() {
             }
         }
 
-        if (tourelles_place < MAX_TOURELLES && tour % 5 == 0) { // Demande tous les 5 tours
+        if (tourelles_place < MAX_TOURELLES && tour % 15 == 0) { // Demande tous les 5 tours
             int i = 1;
             while (i) {
                 printf("On va placer une tourelle à la ligne/colonne que tu veux ! \n");
@@ -158,33 +162,31 @@ int main() {
 
 
         
-        Etudiant* e_courant = ennemis;
-        
-        while (e_courant != NULL) {
+        deplacer_ennemis(grille, ennemis, tourelles);
 
+        // Attaques des tourelles contre les ennemis
+        attaquer_ennemis(grille, tourelles, ennemis, &cagnotte);
+
+        // Attaques des ennemis bloqués contre les tourelles
+        Etudiant *e_courant = ennemis;
+        while (e_courant != NULL) {
             if (e_courant->tour==tour){
                 e_courant->actif = 1;
             }
 
             if (e_courant->actif) {
-                e_courant->colonne--; //fait bouger l'ennemi 
-                if (e_courant->colonne < 0) {
-                    e_courant->actif = 0; //rend l'étudiant inactif (ou mort mais c un peu glauque)
-                }
+                attaquer_tourelles(&tourelles, e_courant);
             }
             e_courant = e_courant->suivant;
         }
-
-        attaquer_ennemis(grille, tourelles, ennemis,&cagnotte);
-
-        attaquer_tourelles(&tourelles,ennemis);
-
     
         tour++;
 
         Sleep(1000);
         
-        if ((verifier_fin(grille)==1) && (tour > 1)) {
+        printf("verifi : %d",verifier_fin(grille));
+
+        if ((verifier_fin(grille)==1) && (tour > 2) && (ennemis==NULL) ) {
             printf("Il n'y a plus d'ennemis dans le jeu ! Gg à toi mon gourmand ! ");
             break;
         }

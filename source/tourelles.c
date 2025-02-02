@@ -75,6 +75,8 @@ void attaquer_ennemis(char grille[LIGNES][COLONNES], Tourelle *tourelles, Etudia
                         //A FAIRE supprimer_enenemi(courant_e)
                         //A FAIRE rajouter de l'argent a la cagnotte
                         grille[courant_e->ligne - 1][courant_e->colonne] = '_'; // Efface l'ennemi de la grille car remplacer par un _
+                        ennemis=supprimer_ennemi(ennemis, courant_e);
+
 
                         int gain = 0;
                         switch (courant_e->type) {
@@ -102,33 +104,26 @@ void attaquer_ennemis(char grille[LIGNES][COLONNES], Tourelle *tourelles, Etudia
 
 }
 
+void attaquer_tourelles(Tourelle **tourelles, Etudiant *ennemi_bloquant) {
+    if (ennemi_bloquant == NULL) return; // Aucun ennemi ne doit attaquer
 
-void attaquer_tourelles(Tourelle **tourelles, Etudiant *ennemis) { // etudiants->>>>> tourelles
-    Etudiant *courant_e = ennemis;
+    Tourelle *courant_t = *tourelles;
+    while (courant_t != NULL) {
+        if (courant_t->ligne == ennemi_bloquant->ligne && 
+            courant_t->colonne == ennemi_bloquant->colonne - 1) {
 
-    while (courant_e != NULL) {
-        if (courant_e->actif) {
-            Tourelle *courant_t = *tourelles;
+            printf("L'ennemi [%c] en (%d, %d) attaque la tourelle en (%d, %d) !\n",
+                   ennemi_bloquant->type, ennemi_bloquant->ligne, ennemi_bloquant->colonne,
+                   courant_t->ligne, courant_t->colonne);
 
-            while (courant_t != NULL) {
-                if (courant_e->ligne == courant_t->ligne && courant_e->colonne == courant_t->colonne) {
-                    printf("\x1B[38;2;255;0;0mL'ennemi [%c] attaque la tourelle en [%d, %d]!\033[0m\n",
-                           courant_e->type, courant_t->ligne, courant_t->colonne);
+            courant_t->vie -= ennemi_bloquant->degats;
 
-                    courant_t->vie -= courant_e->degats; // Réduction en fonction des dégâts de l'ennemi
-
-                    if (courant_t->vie <= 0) {
-                        printf("\x1B[38;2;255;0;0mTourelle en [%d, %d] détruite!\033[0m\n",
-                               courant_t->ligne, courant_t->colonne);
-
-                        *tourelles = supprimer_tourelle(*tourelles, courant_t->ligne, courant_t->colonne);
-                        break;
-                    }
-                }
-                courant_t = courant_t->suivant;
+            if (courant_t->vie <= 0) {
+                *tourelles = supprimer_tourelle(*tourelles, courant_t->ligne, courant_t->colonne);
             }
+            return;
         }
-        courant_e = courant_e->suivant;
+        courant_t = courant_t->suivant;
     }
 }
 
