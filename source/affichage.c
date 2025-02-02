@@ -6,36 +6,6 @@
 #define LIGNES 7
 #define COLONNES 15
 
-/*
-
-void afficher_grille(char grille[LIGNES][COLONNES], int tour, int cagnotte) {
-    printf("\n \033[33m Tour %d  | Cagnotte %d \033[0m \n\n", tour, cagnotte);
-
-    // Affichage des numéros de colonnes 
-    printf("    "); 
-    for (int j = 0; j < COLONNES; j++) {
-        printf("%2d ", j + 1);
-    }
-    printf("\n");
-
-    for (int i = 0; i < LIGNES; i++) {
-        printf("%2d |", i + 1); // Affichage du numéro de ligne
-
-        for (int j = 0; j < COLONNES; j++) {
-            if (grille[i][j] == 'A' || grille[i][j] == 'Z' || grille[i][j] == 'X') {  
-                printf(" \033[31m%-2c\033[0m", grille[i][j]); //-2c pour gerer l'espacement des points 
-            }
-            else if (grille[i][j] == 'T') {  
-                printf(" \033[34m%-2c\033[0m", grille[i][j]); 
-            }
-            else {  
-                printf(" %-2c", grille[i][j]); // Espacement uniforme pour les points en gros (j'ai modifié le %c)
-            }
-        }
-        printf("\n");
-    }
-}
-*/
 
 void afficher_grille(char grille[LIGNES][COLONNES], int tour, int cagnotte, Etudiant *ennemis, Tourelle *tourelles) {
     printf("\n \033[33m Tour %d  | Cagnotte %d \033[0m \n\n", tour, cagnotte);
@@ -123,20 +93,28 @@ void afficher_grille(char grille[LIGNES][COLONNES], int tour, int cagnotte, Etud
 
 
 void initialiser_grille(char grille[LIGNES][COLONNES], Tourelle *tete) {
-    // Initialiser la grille avec des cases vides
+    // Initialisation de la grille avec des points
     for (int i = 0; i < LIGNES; i++) {
         for (int j = 0; j < COLONNES; j++) {
-            grille[i][j] = '.';
+            grille[i][j] = '_'; // on met _ ça change des .
         }
     }
 
-    // Placer les tourelles en fonction de la liste chaînée
+    // Vérification des tourelles avant placement
     Tourelle *courant = tete;
+
     while (courant != NULL) {
-        if (courant->ligne > 0 && courant->ligne <= LIGNES && courant->colonne >= 0 && courant->colonne < COLONNES) {
-            grille[courant->ligne - 1][courant->colonne] = 'T';
+
+        // Vérification des bornes de la grille
+        if (courant->ligne - 1 < 0 || courant->ligne - 1 >= LIGNES || courant->colonne < 0 || courant->colonne >= COLONNES) {
+            printf("Tentative de placement hors grille");
+        } 
+        
+        else {
+            grille[courant->ligne - 1][courant->colonne] = courant->type; // Modification problématique ici
+            //printf("debug typpe est : %c .",courant->type);
         }
+        
         courant = courant->suivant;
     }
 }
-

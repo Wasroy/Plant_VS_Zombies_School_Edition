@@ -17,7 +17,7 @@ typedef struct tourtour{ // !!! on ne pourra pas la placer si un etudiant est su
 
 Tourelle* supprimer_tourelle(Tourelle *tete, int ligne, int colonne);
 Tourelle* ajouter_tourelle(Tourelle *tete, int ligne, int colonne, char type);
-void attaquer_ennemis(char grille[LIGNES][COLONNES], Tourelle *tourelles, Etudiant *ennemis);
+void attaquer_ennemis(char grille[LIGNES][COLONNES], Tourelle *tourelles, Etudiant *ennemis, int* cagnotte);
 void attaquer_tourelles(Tourelle **tourelles, Etudiant *ennemis);
 
 

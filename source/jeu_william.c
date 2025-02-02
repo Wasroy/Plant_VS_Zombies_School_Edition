@@ -23,7 +23,7 @@ int fichier_existe(const char *nom_fichier) {
 
 int verifier_fin(char grille[LIGNES][COLONNES]) {
     for (int i = 0; i < LIGNES; i++) {
-        if (grille[i][0]>='A' && grille[i][0]<='Z' && grille[i][0]!='T') {
+        if (grille[i][0]>='A' && grille[i][0]<='Z' && grille[i][0]!='T' && grille[i][0]!='P' && grille[i][0]!='L' /*rajouter ensuite avec && les autres tourelles*/) {
             return -1; // Un étudiant a atteint la base
         }
     }
@@ -31,10 +31,12 @@ int verifier_fin(char grille[LIGNES][COLONNES]) {
     int p=0;
     for(int i = 0; i<LIGNES; i++){
         for(int j = 0; j < COLONNES; j++){
-            if (grille[i][j]=='Z' && grille[i][j]=='A' && grille[i][j]=='V' && grille[i][j]=='M' && grille[i][j]=='S')
+            if (grille[i][j]=='Z' || grille[i][j]=='A' || grille[i][j]=='V' || grille[i][j]=='M' || grille[i][j]=='S'){ //en gros si il suffit d'une case ou il y a un ennemi
                 p=1;
+            }
         }
     }
+
     if(p==0)
         return 1; //Il n'y a plus d'ennemis dans le jeu 
     return 0;
@@ -135,4 +137,27 @@ void charger_sauvegarde(const char *fichier, int *tour, int *cagnotte, Tourelle 
 
     fclose(fp);
     printf("\n\033[32mSauvegarde chargée avec succès !\033[0m\n");
+}
+
+
+int est_case_occupee(int ligne, int colonne, Tourelle *tourelles, Etudiant *ennemis) {
+    // Vérifier si une tourelle est déjà présente
+    Tourelle *t_courant = tourelles;
+    while (t_courant != NULL) {
+        if (t_courant->ligne == ligne && t_courant->colonne == colonne) {
+            return 1;  // Case occupée par une tourelle
+        }
+        t_courant = t_courant->suivant;
+    }
+
+    // Vérifier si un ennemi est déjà présent
+    Etudiant *e_courant = ennemis;
+    while (e_courant != NULL) {
+        if (e_courant->ligne == ligne && e_courant->colonne == colonne && e_courant->actif) {
+            return 2;  // Case occupée par un ennemi actif
+        }
+        e_courant = e_courant->suivant;
+    }
+
+    return 0;  // La case est libre
 }

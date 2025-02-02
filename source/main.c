@@ -15,7 +15,7 @@
 
 #define LIGNES 7
 #define COLONNES 15
-#define MAX_TOURELLES 3
+#define MAX_TOURELLES 10 // on ne peux pas avoir plus de 10 tourelles
 
 int main() {
 
@@ -57,17 +57,16 @@ int main() {
 
     //on commence avec 3 tourelles de base
     tourelles = ajouter_tourelle(tourelles, 1,0, 'T');
-    tourelles = ajouter_tourelle(tourelles, 3,0, 'L');
+    tourelles = ajouter_tourelle(tourelles, 7,0, 'L');
     tourelles = ajouter_tourelle(tourelles, 4,2, 'P');
 
 
-    int tourelles_place = 2; //on commence chaque partie avec 2 tourelles dès le début !
+    int tourelles_place = 3; //on commence chaque partie avec 3 tourelles dès le début !
 
-    int iteration = 0; 
 
     while (1) { //Boucle du jeu
 
-        printf("\033[2J"); // Efface l'écran
+        //printf("\033[2J"); // Efface l'écran
 
         initialiser_grille(grille, tourelles);
 
@@ -87,81 +86,78 @@ int main() {
             }
         }
 
-        if (tourelles_place<MAX_TOURELLES){
-   
+        if (tourelles_place < MAX_TOURELLES && tour % 5 == 0) { // Demande tous les 5 tours
             int i = 1;
-            while(i){
-
+            while (i) {
                 printf("On va placer une tourelle à la ligne/colonne que tu veux ! \n");
 
-
-                int l; //var tempor pour la ligne qu'on va demandé, sera dcp réinitalise a chaque tour 
-                int col; //var tempor...
+                int l;
+                int col;
                 char type_tour;
 
-                
-                printf("Entre la ligne ou tu veux placer ta tourelle : ");
-                scanf("%d", &l);
-                while(l < 1 || l > 7){
-                    printf("Indice incorrect\n");
-                    printf("Entre la ligne ou tu veux placer ta tourelle : ");
+                // Demander une ligne et une colonne valides
+                do {
+                    printf("Entre la ligne où tu veux placer ta tourelle : ");
                     scanf("%d", &l);
-                }
+                    while (l < 1 || l > 7) {
+                        printf("Indice incorrect\n");
+                        printf("Entre la ligne où tu veux placer ta tourelle : ");
+                        scanf("%d", &l);
+                    }
 
-                printf("Entre la colonne ou tu veux placer ta tourelle : ");
-                scanf("%d", &col);
-                while(col < 1 || col > 15){
-                    printf("Indice incorrect\n");
-                    printf("Entre la colonne ou tu veux placer ta tourelle : ");
+                    printf("Entre la colonne où tu veux placer ta tourelle : ");
                     scanf("%d", &col);
-                }
+                    while (col < 1 || col > 15) {
+                        printf("Indice incorrect\n");
+                        printf("Entre la colonne où tu veux placer ta tourelle : ");
+                        scanf("%d", &col);
+                    }
+
+                    col--; //on decale col par ce que diff entre ce qu'on voit et la colonne de la grille officisuemeent, elle est décalé car commebce en [0] et non en 1
+
+                    int statut = est_case_occupee(l, col, tourelles, ennemis);
+
+                    if (statut == 1) {
+                        printf("\033[31mERREUR : Une tourelle est déjà placée à cet endroit ! Choisis une autre position.\033[0m\n");
+                    } else if (statut == 2) {
+                        printf("\033[31mERREUR : Un ennemi est sur cette case ! Impossible de placer une tourelle ici.\033[0m\n");
+                    }
+
+                } while (est_case_occupee(l, col, tourelles, ennemis) != 0);  // Répéter tant que la case est occupée
 
                 printf("\nTypes de tourelles : -- T (Basique) -- P (Puissante) -- L (Longue portée) --\n");
 
-                do { //on utilise un do pour le demander au moins une fois (puis ça change des while d'au dessus)
+                do {
                     printf("Entre le type de ta tourelle : ");
-                    scanf(" %c", &type_tour);  // Ajout d’un espace avant `%c` pour éviter le problème de buffer
+                    scanf(" %c", &type_tour);
                 } while (type_tour != 'T' && type_tour != 'P' && type_tour != 'L');
 
-                col--;
-
-                //faudra aussi verifie si la ligne est pas déja occupé et renvoyé une erreur ou un msg d'erreur en mode TANT PIS place deja prise donc faudra faire gaffe en tant que joueur car pas de joker
-                /*if (grille[l][col] != '.') {
-                    printf("Attention tu as voulu placer une tourelle mais il y a déjà un étudiant dans la case.")
-                    printf("Tu perds la tourelle et ton argent ! ")
-                } */
-
-                if (cagnotte >= 100 ) { // Coût d'une tourelle : 100 et on est a moins de tourelles sur la grille que de la CONSTANTE MAX_TOURELLES defini plus haut juste en dessous des #include
+                int prix_tourelle = (type_tour == 'T') ? 100 : (type_tour == 'L') ? 200 : 300;
+                if (cagnotte >= prix_tourelle) {
                     tourelles = ajouter_tourelle(tourelles, l, col, type_tour);
-                    cagnotte -= 100;
-                    initialiser_grille(grille, tourelles); // A chaque fois on réinitialise la grille pour afficher la nouvelle grille (avec la nouvelle tourelle)
-                    afficher_grille(grille, tour, cagnotte,ennemis,tourelles); 
+                    cagnotte -= prix_tourelle;
+                    initialiser_grille(grille, tourelles);
+                    afficher_grille(grille, tour, cagnotte, ennemis, tourelles);
                     printf("Tu viens de placer une tourelle !\n \nIl te reste %d pièces d'or \n", cagnotte);
-                    tourelles_place+=1;
-                    
-                }
-
-                else { //on a pas assez d'argent pour placer
-                    printf("Dommage pas assez de sous ! (Tue des ennemis pour récuper des sous) \n"); // A FAIRE DANS tourelles.c 
+                    tourelles_place += 1;
+                } else {
+                    printf("Dommage, pas assez d'argent ! (Tue des ennemis pour récupérer de l'argent)\n");
                     i = 0;
                     break;
                 }
 
-                printf("\n");
-                printf("Veux tu rajouter d'autres toutelles ? (Ecris '1' si tu en veux, ou '0' sinon) : "); //gerer bug si diff de 1 ou 0
+                printf("\nVeux-tu rajouter d'autres tourelles ? (1 = Oui, 0 = Non) : ");
                 scanf("%d", &i);
-                
-                while(i!=1 && i!=0){ // tant qu'on a pas le bon choix 1 ou 0
+                while (i != 1 && i != 0) {
                     printf("Choix incorrect\n");
                     printf("Entre ton choix : ");
                     scanf("%d", &i);
                 }
-
             }
         }
 
+
         
-        // Met à jour les ennemis actifs pour le tour courant
         Etudiant* e_courant = ennemis;
         
         while (e_courant != NULL) {
@@ -179,7 +175,7 @@ int main() {
             e_courant = e_courant->suivant;
         }
 
-        attaquer_ennemis(grille, tourelles, ennemis);
+        attaquer_ennemis(grille, tourelles, ennemis,&cagnotte);
 
         attaquer_tourelles(&tourelles,ennemis);
 
@@ -188,7 +184,7 @@ int main() {
 
         Sleep(1000);
         
-        if ((verifier_fin(grille)==1) && (iteration > 1)) {
+        if ((verifier_fin(grille)==1) && (tour > 1)) {
             printf("Il n'y a plus d'ennemis dans le jeu ! Gg à toi mon gourmand ! ");
             break;
         }
@@ -203,7 +199,6 @@ int main() {
             break;
         }
 
-        iteration++;
     }
 
     while (tourelles != NULL) {

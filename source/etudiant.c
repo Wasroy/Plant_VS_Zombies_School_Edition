@@ -34,10 +34,9 @@ Etudiant* ajouter_ennemi(Etudiant *tete, int tour, int ligne, int colonne, char 
             nouvel_etudiant->pointsDeVie = 3;
             nouvel_etudiant->degats = 1;
             break;
-        case 'A': // Ennemi rapide
+        case 'A': // Ennemi Faible
             nouvel_etudiant->pointsDeVie = 2;
             nouvel_etudiant->degats = 1;
-            //nouvel_etudiant->vitesse = 2;
             break;
         case 'S': // Ennemi solide
             nouvel_etudiant->pointsDeVie = 6;
@@ -61,7 +60,7 @@ Etudiant* ajouter_ennemi(Etudiant *tete, int tour, int ligne, int colonne, char 
 }
 
 
-Etudiant* supprimer_ennemi(Etudiant *tete, Etudiant *ennemi) {
+Etudiant* supprimer_ennemi(Etudiant *tete, Etudiant *ennemi) { //pour les mallocs on utilise la méthode vu en TD suppr les liste chainée
 
     if (ennemi->precedent != NULL) {
         ennemi->precedent->suivant = ennemi->suivant;
@@ -76,7 +75,7 @@ Etudiant* supprimer_ennemi(Etudiant *tete, Etudiant *ennemi) {
     }
 
     free(ennemi);
-    printf("on a suppr l'ennemi t'a capté en brrr");
+    //printf("on a suppr l'ennemi t'a capté en brrr");
     return tete;
 }
 

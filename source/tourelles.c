@@ -17,6 +17,7 @@ Tourelle* ajouter_tourelle(Tourelle *tete, int ligne, int colonne, char type) {
     }
     nouvelle_tourelle->ligne = ligne;
     nouvelle_tourelle->colonne = colonne;
+    nouvelle_tourelle->type = type;
 
     nouvelle_tourelle->suivant = tete; // Ajoute en tête de liste
 
@@ -27,16 +28,19 @@ Tourelle* ajouter_tourelle(Tourelle *tete, int ligne, int colonne, char type) {
             nouvelle_tourelle->vie = 5;
             nouvelle_tourelle->degats = 2;
             nouvelle_tourelle->portee = 3;
+            //prix de 100
             break;
         case 'L': // Tourelle longue portée
             nouvelle_tourelle->vie = 4;
             nouvelle_tourelle->degats = 1;
             nouvelle_tourelle->portee = 5;
+            //prix de 200
             break;
         case 'P': // Tourelle puissante
             nouvelle_tourelle->vie = 6;
             nouvelle_tourelle->degats = 4;
             nouvelle_tourelle->portee = 2;
+            //prix de 300
             break;
 
         default:
@@ -49,7 +53,7 @@ Tourelle* ajouter_tourelle(Tourelle *tete, int ligne, int colonne, char type) {
 }
 
 
-void attaquer_ennemis(char grille[LIGNES][COLONNES], Tourelle *tourelles, Etudiant *ennemis) { //tourelles->>>>>etudiants
+void attaquer_ennemis(char grille[LIGNES][COLONNES], Tourelle *tourelles, Etudiant *ennemis, int* cagnotte) { //tourelles->>>>>etudiants
     Tourelle *courant_t = tourelles;
 
     while (courant_t != NULL) { 
@@ -70,7 +74,20 @@ void attaquer_ennemis(char grille[LIGNES][COLONNES], Tourelle *tourelles, Etudia
                         courant_e->actif = 0; // desactive l'ennemi => le supppr de l'affichage
                         //A FAIRE supprimer_enenemi(courant_e)
                         //A FAIRE rajouter de l'argent a la cagnotte
-                        grille[courant_e->ligne - 1][courant_e->colonne] = '.'; // Efface l'ennemi de la grille car remplacer par un .
+                        grille[courant_e->ligne - 1][courant_e->colonne] = '_'; // Efface l'ennemi de la grille car remplacer par un _
+
+                        int gain = 0;
+                        switch (courant_e->type) {
+                            case 'Z': gain = 50; break;
+                            case 'A': gain = 60; break;
+                            case 'S': gain = 100; break;
+                            case 'M': gain = 200; break;
+                            case 'V': gain = 75; break;
+                            default: gain = 50; // au cas ou on mets un ptit default
+                        }
+
+                        *cagnotte += gain;
+                        printf("\033[33m Tu viens de gagner %d pièces d'or \033[0m \n", gain);
 
                     }
  
@@ -86,7 +103,7 @@ void attaquer_ennemis(char grille[LIGNES][COLONNES], Tourelle *tourelles, Etudia
 }
 
 
-void attaquer_tourelles(Tourelle **tourelles, Etudiant *ennemis) {
+void attaquer_tourelles(Tourelle **tourelles, Etudiant *ennemis) { // etudiants->>>>> tourelles
     Etudiant *courant_e = ennemis;
 
     while (courant_e != NULL) {
@@ -119,7 +136,7 @@ void attaquer_tourelles(Tourelle **tourelles, Etudiant *ennemis) {
 
 
 
-Tourelle* supprimer_tourelle(Tourelle *tete, int ligne, int colonne) {
+Tourelle* supprimer_tourelle(Tourelle *tete, int ligne, int colonne) { //pour la mémoire
     Tourelle *courant = tete;
     Tourelle *precedent = NULL;
 
