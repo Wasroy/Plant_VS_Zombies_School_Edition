@@ -92,10 +92,6 @@ gcc Source/*.c -o dauphine_defender
 - **Communication:** Discord, Trello
 - **Resources:** Wikipedia, YouTube tutorials, GitHub
 
-## Developers
-
-- **Rayan Bourgou**
-- **William Miserolle**
 
 ---
 
